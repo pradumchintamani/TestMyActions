@@ -17,12 +17,12 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: '11'  # Specify a valid Java version
-          distribution: 'adopt'  # Specify a valid Java distribution
+          java-version: '11'  
+          distribution: 'adopt'  
 
       - name: Build with Maven
         run: mvn clean install
-        # Add any specific Maven commands or options here
+       
 
   test:
     name: Test
@@ -35,13 +35,11 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: '11'  # Specify a valid Java version
-          distribution: 'adopt'  # Specify a valid Java distribution
-
+          java-version: '11'  
+          distribution: 'adopt'  
       - name: Run Tests with Maven
         run: mvn test
-        # Add any specific test-related Maven commands or options here
-
+       
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
@@ -54,7 +52,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: '11'  # Specify a valid Java version
-          distribution: 'adopt'  # Specify a valid Java distribution
+          java-version: '11'  
+          distribution: 'adopt'  
 
-      # Add deployment steps here, such as deploying to a server or a cloud platform.
+     
