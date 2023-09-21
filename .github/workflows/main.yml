@@ -55,4 +55,10 @@ jobs:
           java-version: '11'  
           distribution: 'adopt'  
 
-     
+      - name: Send deployment alert to Microsoft Teams
+        env:
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{
+            "text": "Deployment to production is complete!"
+          }' $TEAMS_WEBHOOK   
