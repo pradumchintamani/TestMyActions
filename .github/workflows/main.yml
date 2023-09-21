@@ -22,6 +22,14 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+
+      - name: Send build completion alert to Microsoft Teams
+        env:
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+        run: |
+          curl -X POST -H 'Content-Type: application/json' -d '{
+            "text": "Build is complete!"
+          }' $TEAMS_WEBHOOK
        
 
   test:
