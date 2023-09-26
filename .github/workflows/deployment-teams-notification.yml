@@ -1,0 +1,67 @@
+name: Send Deployment Status to Teams
+
+on:
+  deployment_status:
+    types:
+      - success
+      - failure
+
+jobs:
+  send-teams-notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare JSON Payload
+        id: prepare-payload
+        run: |
+          status="$GITHUB_DEPLOYMENT_STATUS"
+          if [ "$status" == "success" ]; then
+            color="#2ECC71"  # Green
+            text="Deployment was successful."
+          else
+            color="#D32F2F"  # Red
+            text="Deployment failed."
+          fi
+          
+          payload="{
+            \"@type\": \"MessageCard\",
+            \"@context\": \"http://schema.org/extensions\",
+            \"themeColor\": \"$color\",
+            \"summary\": \"Deployment Status\",
+            \"sections\": [
+              {
+                \"activityTitle\": \"$text\",
+                \"activityImage\": \"https://github.com/github.png\",
+                \"facts\": [
+                  {
+                    \"name\": \"Repository\",
+                    \"value\": \"$GITHUB_REPOSITORY\"
+                  },
+                  {
+                    \"name\": \"Environment\",
+                    \"value\": \"$GITHUB_ENVIRONMENT\"
+                  },
+                  {
+                    \"name\": \"Deployed By\",
+                    \"value\": \"$GITHUB_ACTOR\"
+                  }
+                ]
+              }
+            ]
+          }"
+          
+          echo "$payload" > payload.json
+          
+          echo "::set-output name=payload::$(cat payload.json)"
+          
+        env:
+          GITHUB_DEPLOYMENT_STATUS: ${{ github.event.deployment_status.state }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_ENVIRONMENT: ${{ github.event.deployment.environment }}
+          GITHUB_ACTOR: ${{ github.actor }}
+
+      - name: Send Notification to Teams
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d "$(<payload.json)" ${{ secrets.TEAMS_WEBHOOK }}
+        env:
+          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
