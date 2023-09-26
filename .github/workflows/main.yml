@@ -48,11 +48,11 @@ jobs:
       - name: Run Tests with Maven
         run: mvn test
         
-      - name: Send Alert to Teams
-        uses: slack/webhook-action@v1
-        with:
-          url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-          payload: '{"text": "Alert! Something important happened in the repository."}' 
+      # - name: Send Alert to Teams
+      #   uses: slack/webhook-action@v1
+      #   with:
+      #     url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+      #     payload: '{"text": "Alert! Something important happened in the repository."}' 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
