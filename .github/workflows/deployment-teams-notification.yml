@@ -65,3 +65,4 @@ jobs:
           curl -X POST -H "Content-Type: application/json" -d "$(<payload.json)" ${{ secrets.TEAMS_WEBHOOK }}
         env:
           TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+
