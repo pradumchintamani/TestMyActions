@@ -49,7 +49,7 @@ jobs:
         run: mvn test
         
       - name: Send Alert to Teams
-        uses: slack/webhook-action@v1
+        uses: microsoft/teams-notify@v1
         with:
           url: ${{ secrets.TEAMS_WEBHOOK }}
           payload: '{"text": "Alert! Something important happened in the repository."}' 
