@@ -57,5 +57,7 @@ jobs:
           java-version: '11'  
           distribution: 'adopt'  
 
-     
+      - name: Set Deployment Status Output
+        id: deployment-status
+        run: echo "::set-output name=deployment-status::success"
 
