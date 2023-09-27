@@ -28,16 +28,23 @@ jobs:
       #     apt-get update
       #     apt-get install -y gh
 
-      - name: Install GitHub CLI
-        run: |
-            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-            sudo apt-add-repository https://cli.github.com/packages
-            sudo apt update
-            sudo apt install gh
+      # - name: Install GitHub CLI
+      #   run: |
+      #       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+      #       sudo apt-add-repository https://cli.github.com/packages
+      #       sudo apt update
+      #       sudo apt install gh
 
+      - name: Install cURL
+        run: sudo apt-get install -y curl
 
       - name: Get Workflow Conclusion
+        id: conclusion
         run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
+
+
+      # - name: Get Workflow Conclusion
+      #   run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
 
       - name: Send Teams Notification
         env:
