@@ -78,6 +78,6 @@ jobs:
     }
   ],
   "eventType": "'"$event"'"
-}' > payload.json
+' > payload.json
 
           curl -X POST -H "Content-Type: application/json" -d "@payload.json" "$MSTEAMS_WEBHOOK_URL"
