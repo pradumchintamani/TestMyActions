@@ -6,6 +6,7 @@ on:
     types:
       - completed
 
+
 jobs:
   send-teams-notification:
     name: Send Teams Notification
