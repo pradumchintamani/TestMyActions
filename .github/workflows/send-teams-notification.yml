@@ -1,27 +1,24 @@
 name: Send Deployment Status to MS Teams
-
-on:
+'on':
   workflow_run:
     workflows:
-      - "Maven Build, Test, and Deploy"
+      - 'Maven Build, Test, and Deploy'
     types:
       - completed
 jobs:
   send-teams-notification:
     name: Send Teams Notification
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-
       - name: Install cURL
         run: sudo apt-get install -y curl
+
 
       - name: Get Workflow Conclusion
         id: conclusion
