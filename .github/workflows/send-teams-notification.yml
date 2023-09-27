@@ -43,28 +43,27 @@ jobs:
           fi
 
           # Define the JSON payload using a HEREDOC
-          payload_json=$(cat <<EOF
-{
+          echo '{
   "@type": "MessageCard",
   "@context": "http://schema.org/extensions",
-  "themeColor": "$color",
+  "themeColor": "'"$color"'",
   "summary": "Deployment Status",
   "sections": [
     {
-      "activityTitle": "$text",
+      "activityTitle": "'"$text"'",
       "activityImage": "https://github.com/github.png",
       "facts": [
         {
           "name": "Repository",
-          "value": "$GITHUB_REPOSITORY"
+          "value": "'"$GITHUB_REPOSITORY"'"
         },
         {
           "name": "Environment",
-          "value": "$GITHUB_ENVIRONMENT"
+          "value": "'"$GITHUB_ENVIRONMENT"'"
         },
         {
           "name": "Deployed By",
-          "value": "$GITHUB_ACTOR"
+          "value": "'"$GITHUB_ACTOR"'"
         }
       ]
     }
@@ -76,15 +75,12 @@ jobs:
       "targets": [
         {
           "os": "default",
-          "uri": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          "uri": "'"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'"
         }
       ]
     }
   ],
-  "eventType": "$event"
-}
-EOF
-)
+  "eventType": "'"$event"'"
+}' > payload.json
 
-          echo "$payload_json" > payload.json
           curl -X POST -H "Content-Type: application/json" -d "@payload.json" "$MSTEAMS_WEBHOOK_URL"
