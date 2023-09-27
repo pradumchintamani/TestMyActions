@@ -1,8 +1,9 @@
+---
 name: Send Deployment Status to MS Teams
-'on':
+on:
   workflow_run:
     workflows:
-      - 'Maven Build, Test, and Deploy'
+      - Maven Build, Test, and Deploy
     types:
       - completed
 jobs:
@@ -15,20 +16,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "14"
       - name: Install cURL
         run: sudo apt-get install -y curl
-
-
       - name: Get Workflow Conclusion
         id: conclusion
-        run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
-        
+        run: echo "::set-output name=conclusion::${{
+          github.event.workflow_run.conclusion }}"
       - name: Send Teams Notification
         env:
           MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
-        run: |
+        run: >
           conclusion="${{ steps.conclusion.outputs.conclusion }}"
+
           if [ "$conclusion" == "success" ]; then
             color="#2ECC71"  # Green
             text="Deployment was successful."
@@ -39,45 +39,61 @@ jobs:
             event="DeploymentFailure"
           fi
 
+
           # Define the JSON payload using a HEREDOC
+
           echo '{
-  "@type": "MessageCard",
-  "@context": "http://schema.org/extensions",
-  "themeColor": "'"$color"'",
-  "summary": "Deployment Status",
-  "sections": [
-    {
-      "activityTitle": "'"$text"'",
-      "activityImage": "https://github.com/github.png",
-      "facts": [
-        {
+
+          "@type": "MessageCard",
+
+          "@context": "http://schema.org/extensions",
+
+          "themeColor": "'"$color"'",
+
+          "summary": "Deployment Status",
+
+          "sections": [
+                {
+
+          "activityTitle": "'"$text"'",
+
+          "activityImage": "https://github.com/github.png",
+
+          "facts": [
+                {
           "name": "Repository",
+
           "value": "'"$GITHUB_REPOSITORY"'"
-        },
-        {
+                },
+                {
           "name": "Environment",
+
           "value": "'"$GITHUB_ENVIRONMENT"'"
-        },
-        {
+                },
+                {
           "name": "Deployed By",
+
           "value": "'"$GITHUB_ACTOR"'"
-        }
-      ]
-    }
-  ],
-  "potentialAction": [
-    {
-      "@type": "OpenUri",
-      "name": "View on GitHub",
-      "targets": [
-        {
+                }
+                     ]
+                }
+                     ],
+          "potentialAction": [
+                {
+          "@type": "OpenUri",
+
+          "name": "View on GitHub",
+
+          "targets": [
+                {
           "os": "default",
+
           "uri": "'"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'"
-        }
-      ]
-    }
-  ],
-  "eventType": "'"$event"'"
-' > payload.json
+                }
+                     ]
+                }
+                     ],
+          "eventType": "'"$event"'"
+                }' > payload.json
 
           curl -X POST -H "Content-Type: application/json" -d "@payload.json" "$MSTEAMS_WEBHOOK_URL"
