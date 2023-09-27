@@ -10,7 +10,7 @@ jobs:
   send-teams-notification:
     name: Send Teams Notification
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -26,6 +26,7 @@ jobs:
       - name: Get Workflow Conclusion
         id: conclusion
         run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
+
         
       - name: Send Teams Notification
         env:
