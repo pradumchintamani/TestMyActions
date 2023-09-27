@@ -6,6 +6,7 @@ on:
       - success
       - failure
 
+
 jobs:
   send-teams-notification:
     runs-on: ubuntu-latest
