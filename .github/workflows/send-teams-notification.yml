@@ -20,12 +20,20 @@ jobs:
         with:
           node-version: '14'
 
+      # - name: Install GitHub CLI
+      #   run: |
+      #     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/local/share/keyrings/githubcli-archive-keyring.gpg
+      #     echo "deb [signed-by=/usr/local/share/keyrings/githubcli-archive-keyring.gpg arch=all] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+      #     apt-get update
+      #     apt-get install -y gh
+
       - name: Install GitHub CLI
-        run: |
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/local/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [signed-by=/usr/local/share/keyrings/githubcli-archive-keyring.gpg arch=all] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          apt-get update
-          apt-get install -y gh
+          run: |
+            sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+            sudo apt-add-repository https://cli.github.com/packages
+            sudo apt update
+            sudo apt install gh
+
 
       - name: Get Workflow Conclusion
         run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
