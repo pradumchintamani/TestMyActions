@@ -10,7 +10,7 @@ jobs:
   send-teams-notification:
     name: Send Teams Notification
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
