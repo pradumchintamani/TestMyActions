@@ -2,7 +2,8 @@ name: Send Deployment Status to MS Teams
 
 on:
   workflow_run:
-    workflows: ["Maven Build, Test, and Deploy"]
+    workflows:
+      - "Maven Build, Test, and Deploy"
     types:
       - completed
 
