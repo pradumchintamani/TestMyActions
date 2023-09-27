@@ -1,28 +1,48 @@
-name: Send Deployment Status to Teams
+name: Send Deployment Status to MS Teams
 
 on:
-  deployment_status:
+  workflow_run:
+    workflows: ["Maven Build, Test, and Deploy"]
     types:
-      - success
-      - failure
+      - completed
 
 jobs:
   send-teams-notification:
+    name: Send Teams Notification
     runs-on: ubuntu-latest
 
     steps:
-      - name: Prepare JSON Payload
-        id: prepare-payload
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install GitHub CLI
         run: |
-          status="$GITHUB_DEPLOYMENT_STATUS"
-          if [ "$status" == "success" ]; then
-            color="#2ECC71"  # Green
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/local/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [signed-by=/usr/local/share/keyrings/githubcli-archive-keyring.gpg arch=all] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt-get update
+          apt-get install -y gh
+
+      - name: Get Workflow Conclusion
+        run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
+
+      - name: Send Teams Notification
+        env:
+          MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
+        run: |
+          conclusion="${{ steps.GetWorkflowConclusion.outputs.conclusion }}"
+          if [ "$conclusion" == "success" ]; then
             text="Deployment was successful."
+            color="#2ECC71"  # Green
           else
-            color="#D32F2F"  # Red
             text="Deployment failed."
+            color="#D32F2F"  # Red
           fi
-          
+
           payload="{
             \"@type\": \"MessageCard\",
             \"@context\": \"http://schema.org/extensions\",
@@ -49,19 +69,6 @@ jobs:
               }
             ]
           }"
-          
-          echo "$payload" > payload.json
-          
-          echo "::set-output name=payload::$(cat payload.json)"
-          
-        env:
-          GITHUB_DEPLOYMENT_STATUS: ${{ github.event.deployment_status.state }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_ENVIRONMENT: ${{ github.event.deployment.environment }}
-          GITHUB_ACTOR: ${{ github.actor }}
 
-      - name: Send Notification to Teams
-        run: |
-          curl -X POST -H "Content-Type: application/json" -d "$(<payload.json)" ${{ secrets.TEAMS_WEBHOOK }}
-        env:
-          TEAMS_WEBHOOK: ${{ secrets.TEAMS_WEBHOOK }}
+          echo "$payload" > payload.json
+          curl -X POST -H "Content-Type: application/json" -d "@payload.json" "$MSTEAMS_WEBHOOK_URL"
