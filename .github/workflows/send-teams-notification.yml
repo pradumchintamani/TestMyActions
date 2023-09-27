@@ -6,7 +6,6 @@ on:
     types:
       - completed
 
-
 jobs:
   send-teams-notification:
     name: Send Teams Notification
@@ -21,20 +20,6 @@ jobs:
         with:
           node-version: '14'
 
-      # - name: Install GitHub CLI
-      #   run: |
-      #     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | gpg --dearmor -o /usr/local/share/keyrings/githubcli-archive-keyring.gpg
-      #     echo "deb [signed-by=/usr/local/share/keyrings/githubcli-archive-keyring.gpg arch=all] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-      #     apt-get update
-      #     apt-get install -y gh
-
-      # - name: Install GitHub CLI
-      #   run: |
-      #       sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-      #       sudo apt-add-repository https://cli.github.com/packages
-      #       sudo apt update
-      #       sudo apt install gh
-
       - name: Install cURL
         run: sudo apt-get install -y curl
 
@@ -42,21 +27,19 @@ jobs:
         id: conclusion
         run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
 
-
-      # - name: Get Workflow Conclusion
-      #   run: echo "::set-output name=conclusion::${{ github.event.workflow_run.conclusion }}"
-
       - name: Send Teams Notification
         env:
           MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
         run: |
-          conclusion="${{ steps.GetWorkflowConclusion.outputs.conclusion }}"
+          conclusion="${{ steps.conclusion.outputs.conclusion }}"
           if [ "$conclusion" == "success" ]; then
             text="Deployment was successful."
             color="#2ECC71"  # Green
+            event="DeploymentSuccess"
           else
             text="Deployment failed."
             color="#D32F2F"  # Red
+            event="DeploymentFailure"
           fi
 
           payload="{
@@ -83,7 +66,20 @@ jobs:
                   }
                 ]
               }
-            ]
+            ],
+            \"potentialAction\": [
+              {
+                \"@type\": \"OpenUri\",
+                \"name\": \"View on GitHub\",
+                \"targets\": [
+                  {
+                    \"os\": \"default\",
+                    \"uri\": \"$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID\"
+                  }
+                ]
+              }
+            ],
+            \"eventType\": \"$event\"
           }"
 
           echo "$payload" > payload.json
