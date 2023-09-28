@@ -1,4 +1,4 @@
-name: Maven Build, Test, and Deploy
+name: Maven Build, Test, and deploy
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       
       - name: Build with Maven
         run: mvn clean install
-
+      
      
 
   test:
@@ -43,7 +43,7 @@ jobs:
         
     
   deploy:
-    name: Deploy
+    name: deploy
     runs-on: ubuntu-latest
     needs: [build, test]
 
@@ -60,4 +60,81 @@ jobs:
       - name: Set Deployment Status Output
         id: deployment-status
         run: echo "::set-output name=deployment-status::success"
+  notify:
+    runs-on: ubuntu-latest
+    needs: deploy  # Wait for the 'deploy' job to finish
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Send Deployment Status to Teams
+        env:
+          MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
+        run: |
+          conclusion="${{ needs.deploy.outputs.conclusion }}"
+          if [ "$conclusion" == "success" ]; then
+            color="#2ECC71"  # Green
+            text="Deployment was successful."
+            event="DeploymentSuccess"
+          else
+            color="#D32F2F"  # Red
+            text="Deployment failed."
+            event="DeploymentFailure"
+          fi
+
+          payload=$(cat <<EOF
+          {
+            "@type": "MessageCard",
+            "@context": "http://schema.org/extensions",
+            "themeColor": "$color",
+            "summary": "Deployment Status",
+            "sections": [
+              {
+                "activityTitle": "$text",
+                "activityImage": "https://github.com/github.png",
+                "facts": [
+                  {
+                    "name": "Repository",
+                    "value": "$GITHUB_REPOSITORY"
+                  },
+                  {
+                    "name": "Environment",
+                    "value": "$GITHUB_ENVIRONMENT"
+                  },
+                  {
+                    "name": "Deployed By",
+                    "value": "$GITHUB_ACTOR"
+                  }
+                ]
+              }
+            ],
+            "potentialAction": [
+              {
+                "@type": "OpenUri",
+                "name": "View on GitHub",
+                "targets": [
+                  {
+                    "os": "default",
+                    "uri": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+                  }
+                ]
+              }
+            ],
+            "eventType": "$event"
+          }
+          EOF
+          )
+
+          echo "$payload" > payload.json
+
+          curl -X POST -H "Content-Type: application/json" -d "@payload.json" "$MSTEAMS_WEBHOOK_URL"
 
