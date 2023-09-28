@@ -25,21 +25,31 @@ jobs:
           github.event.workflow_run.conclusion }}"
       - name: Send Teams Notification
         env:
-          # MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
+          MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
         run: >
-          conclusion="${{ steps.conclusion.outputs.conclusion }}"
+          # conclusion="${{ steps.conclusion.outputs.conclusion }}"
 
 
-          if [ "$conclusion" == "success" ]; then
-            color="#2ECC71"  # Green
-            text="Deployment was successful."
-            event="DeploymentSuccess"
+          # if [ "$conclusion" == "success" ]; then
+          #   color="#2ECC71"  # Green
+          #   text="Deployment was successful."
+          #   event="DeploymentSuccess"
+          # else
+          #   color="#D32F2F"  # Red
+          #   text="Deployment failed."
+          #   event="DeploymentFailure"
+          # fi
+          if [ -z "$conclusion" ]; then
+              eventType="Unknown"
           else
-            color="#D32F2F"  # Red
-            text="Deployment failed."
-            event="DeploymentFailure"
+            if [ "$conclusion" == "success" ]; then
+              eventType="DeploymentSuccess"
+            else
+              eventType="DeploymentFailure"
+            fi
           fi
 
+          echo "eventType is set to: $eventType"
 
           # Define the JSON payload using a HEREDOC
 
