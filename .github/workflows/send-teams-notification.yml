@@ -27,7 +27,7 @@ jobs:
         env:
           MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
         run: >
-          # conclusion="${{ steps.conclusion.outputs.conclusion }}"
+          conclusion="${{ steps.conclusion.outputs.conclusion }}"
 
 
           # if [ "$conclusion" == "success" ]; then
@@ -39,15 +39,15 @@ jobs:
           #   text="Deployment failed."
           #   event="DeploymentFailure"
           # fi
-          if [ -z "$conclusion" ]; then
-              eventType="Unknown"
-          else
+          # if [ -z "$conclusion" ]; then
+          #   eventType="Unknown"
+          # else
             if [ "$conclusion" == "success" ]; then
               eventType="DeploymentSuccess"
             else
               eventType="DeploymentFailure"
             fi
-          fi
+          # fi
 
           echo "eventType is set to: $eventType"
 
