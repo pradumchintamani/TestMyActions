@@ -25,7 +25,7 @@ jobs:
           github.event.workflow_run.conclusion }}"
       - name: Send Teams Notification
         env:
-          MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
+          # MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
         run: >
           conclusion="${{ steps.conclusion.outputs.conclusion }}"
 
