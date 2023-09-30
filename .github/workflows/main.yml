@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
@@ -27,7 +27,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
@@ -44,7 +44,7 @@ jobs:
     
   deploy:
     name: deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [build, test]
 
     steps:
@@ -61,7 +61,7 @@ jobs:
         id: deployment-status
         run: echo "::set-output name=deployment-status::success"
   notify:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: deploy  # Wait for the 'deploy' job to finish
 
     steps:
