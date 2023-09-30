@@ -38,6 +38,7 @@ jobs:
         with:
           java-version: '11'  
           distribution: 'adopt'  
+      
       - name: Run Tests with Maven
         run: mvn test
         
@@ -56,7 +57,16 @@ jobs:
         with:
           java-version: '11'  
           distribution: 'adopt'  
+      - name: Buid war
+        run: |
+          mvn clean install
+          mvn package
+        working-directory: /TestMyActions/
 
+      - name: Deploy to tomcat
+        run: |
+          cp /TestMyActions/TestMyActions.war C:\Program Files\apache-tomcat-10.1.13\webapps
+          
       - name: Set Deployment Status Output
         id: deployment-status
         run: echo "::set-output name=deployment-status::success"
