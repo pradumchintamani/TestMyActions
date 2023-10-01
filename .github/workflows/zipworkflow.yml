@@ -8,11 +8,25 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
+  check-docker-image:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: List files in workspace
-        run: |
-          ls -R $GITHUB_WORKSPACE
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: action-zip
-        uses: montudor/action-zip@v1.0.0
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Check if Docker Image Exists
+      run: |
+        image_id="94351b:c1ace0567d8b450d83f8d0b626f8677f"
+        image_path="/home/runner/work/TestMyActions/TestMyActions:/github/workspace"
+        
+        # Use the docker image inspect command to check if the image exists
+        if docker image inspect $image_id &> /dev/null; then
+          echo "Docker image $image_id exists at path: $image_path"
+        else
+          echo "Docker image $image_id does not exist at path: $image_path"
+        fi
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: action-zip
+      uses: montudor/action-zip@v1.0.0
