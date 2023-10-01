@@ -22,7 +22,7 @@ jobs:
 
     - name: Check if Docker Image Exists
       run: |
-        image_id="94351b:c1ace0567d8b450d83f8d0b626f8677f"
+        image_id="94351b"
         image_path="/home/runner/work/TestMyActions/TestMyActions:/github/workspace"
         
         # Use the docker image inspect command to check if the image exists
