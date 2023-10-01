@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -name: list files in workspace
-       run: |
-         ls -R $GITHUB_WORKSPACE
+      - name: List files in workspace
+        run: |
+          ls -R $GITHUB_WORKSPACE
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: action-zip
