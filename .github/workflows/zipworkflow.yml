@@ -7,7 +7,12 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+    - name: action-zip
+      uses: montudor/action-zip@v1.0.0
+      
   check-docker-image:
     runs-on: ubuntu-latest
 
@@ -26,7 +31,4 @@ jobs:
         else
           echo "Docker image $image_id does not exist at path: $image_path"
         fi
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-    - name: action-zip
-      uses: montudor/action-zip@v1.0.0
+
