@@ -80,14 +80,14 @@ jobs:
         env:
           MSTEAMS_WEBHOOK_URL: ${{ secrets.MSTEAMS_WEBHOOK_URL }}
         run: |
-          if [ "${{ needs.deploy.outcome }}" != "success" ]; then
-            color="#D32F2F"  # Red
-            text="Deployment failed or was not applicable."
-            event="DeploymentFailure"
-          else
+          if [ "${{ job.status }}" == "success" ]; then
             color="#2ECC71"  # Green
-            text="Deployment was successful."
-            event="DeploymentSuccess"
+            text="Workflow was successful."
+            event="WorkflowSuccess"
+          else
+            color="#D32F2F"  # Red
+            text="Workflow failed."
+            event="WorkflowFailure"
           fi
           # conclusion="${{ needs.deploy.outputs.conclusion }}"
           # if [ "$conclusion" == "success" ]; then
